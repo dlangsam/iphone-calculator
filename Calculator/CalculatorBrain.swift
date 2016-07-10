@@ -17,6 +17,7 @@ func factorial(operand: Double) -> Double {
 class CalculatorBrain {
     private var accumulator = 0.0
     private var isPartialResult = true
+    private var afterEqual = false
     private var orderOfOperations = [String]()
     
     func setOperand(operand: Double){
@@ -52,14 +53,26 @@ class CalculatorBrain {
         case Equals
         case Clears
     }
+    func checkIfAfterEqual(){
+        if(afterEqual){
+            clearCalc()
+            afterEqual = false;
+        }
+        
+    }
     func performOperations(symbol: String){
         if let operation  = operations[symbol]{
             switch operation{
                 case .Constant(let value):
+                    if(afterEqual){
+                        clearCalc()
+                    }
                     accumulator = value
                     if isPartialResult {orderOfOperations.append(symbol)}
                     else {orderOfOperations = [symbol]}
+                    afterEqual = false;
                 case .UnaryOperation(let function):
+                
                     if(!isPartialResult){
                         orderOfOperations.insert(symbol + "(", atIndex: 0)
                         orderOfOperations.append(")")
@@ -69,16 +82,18 @@ class CalculatorBrain {
                         orderOfOperations.append(")")
 
                     }
-                   
+                    afterEqual = false
                     accumulator = function(accumulator)
                 case .BinaryOperation(let function):
-                                       orderOfOperations.append(symbol)
+                    orderOfOperations.append(symbol)
                     executePendingBinaryOperation()
                     pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand:accumulator)
                     isPartialResult = true
+                    afterEqual = false
                 case .Equals:
                     executePendingBinaryOperation()
                     isPartialResult = false
+                    afterEqual = true
                 case .Clears:
                     clearCalc()
                 
@@ -119,7 +134,7 @@ class CalculatorBrain {
     }
     var getDescription: String {
         get{
-            if orderOfOperations.isEmpty {return ""}
+            if orderOfOperations.isEmpty {return " "}
             else if isPartialResult { return description + "..."}
             else{ return description + "="}
         }

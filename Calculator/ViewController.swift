@@ -15,9 +15,13 @@ class ViewController: UIViewController {
     @IBOutlet weak var display: UILabel!
     
     private var userInMiddleOfTyping = false
+ 
+    
    
+     private var brain = CalculatorBrain()
     @IBAction private func touchDigit(sender: UIButton) {
         
+        brain.checkIfAfterEqual()
         let digit = sender.currentTitle!
         if(userInMiddleOfTyping){
             let textCurrentlyInDisplay = display.text!
@@ -27,6 +31,7 @@ class ViewController: UIViewController {
              display.text = digit
         }
         userInMiddleOfTyping = true
+       
         
     }
     private var displayValue: Double {
@@ -38,7 +43,7 @@ class ViewController: UIViewController {
         }
     }
     
-    private var brain = CalculatorBrain()
+   
     @IBAction private func performOperation(sender: UIButton) {
         
 
