@@ -34,12 +34,12 @@ class ViewController: UIViewController {
        
         
     }
-    private var displayValue: Double {
+    private var displayValue: Double? {
         get{
             return Double(display.text!)!
         }
         set{
-            display.text = String(newValue)
+            display.text = newValue != nil ? String(newValue!) : " "
         }
     }
     //code not needed for assignment
@@ -57,7 +57,7 @@ class ViewController: UIViewController {
         
 
         if userInMiddleOfTyping{
-            brain.setOperand(displayValue)
+            brain.setOperand(displayValue!)
         }
 
         userInMiddleOfTyping = false
