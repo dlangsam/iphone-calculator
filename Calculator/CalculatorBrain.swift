@@ -17,7 +17,11 @@ func factorial(operand: Double) -> Double {
 class CalculatorBrain {
     private var accumulator = 0.0
     private var internalProgram = [AnyObject]()
-    private var isPartialResult = true
+    private var isPartialResult: Bool {
+        get{
+            return pending != nil
+        }
+    }
     private var afterEqual = false
     private var orderOfOperations = [String]()
     
@@ -26,6 +30,19 @@ class CalculatorBrain {
         internalProgram.append(operand)
         accumulator = operand
     }
+    
+    func setOperand(symbol: String){
+        if(afterEqual){
+            eraseCalculation()
+        }
+        variableValues[symbol] = variableValues[symbol] ?? 0.0
+        accumulator = variableValues[symbol]!
+        orderOfOperations.append(symbol)
+        internalProgram.append(symbol)
+     
+    }
+    
+    var variableValues: Dictionary<String, Double> = [:]
     
     private var operations: Dictionary<String,Operation> = [
         "π" : Operation.Constant(M_PI),
@@ -57,7 +74,7 @@ class CalculatorBrain {
     }
     func checkIfAfterEqual(){
         if(afterEqual){
-            clearCalc()
+            eraseCalculation()
             afterEqual = false;
         }
         
@@ -68,7 +85,7 @@ class CalculatorBrain {
             switch operation{
                 case .Constant(let value):
                     if(afterEqual){
-                        clearCalc()
+                        eraseCalculation()
                     }
                     accumulator = value
                     if isPartialResult {orderOfOperations.append(symbol)}
@@ -91,14 +108,13 @@ class CalculatorBrain {
                     orderOfOperations.append(symbol)
                     executePendingBinaryOperation()
                     pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand:accumulator)
-                    isPartialResult = true
+                    
                     afterEqual = false
                 case .Equals:
                     executePendingBinaryOperation()
-                    isPartialResult = false
                     afterEqual = true
                 case .Clears:
-                    clearCalc()
+                    clear()
                 
             }
         }
@@ -112,13 +128,7 @@ class CalculatorBrain {
             
         }
     }
-    private func clearCalc(){
-        accumulator = 0.0
 
-        orderOfOperations = []
-        pending = nil
-        isPartialResult = true
-    }
    
     private var pending: PendingBinaryOperationInfo?
     private struct PendingBinaryOperationInfo {
@@ -137,6 +147,9 @@ class CalculatorBrain {
     }
     var getDescription: String {
         get{
+            
+ 
+            
             if orderOfOperations.isEmpty {return " "}
             else if isPartialResult { return description + "..."}
             else{ return description + "="}
@@ -149,23 +162,50 @@ class CalculatorBrain {
             return internalProgram
         }
         set {
-            clear()
+            eraseCalculation()
             if let arrayOfOps = newValue as? [AnyObject]
             {
                 for op in arrayOfOps{
                     if let operand = op as? Double{
                         setOperand(operand)
-                    }else if let operation = op as? String{
-                        performOperations(operation)
+                    }else if let variableName = op as? String{
+                        if variableValues[variableName] != nil{
+                            setOperand(variableName)
+                        }else if let operation = op as? String{
+                            performOperations(operation)
+                        }
                     }
                 }
             }
         }
     }
+    private func eraseCalculation(){
+        accumulator = 0.0
+        
+        orderOfOperations = []
+        pending = nil
+
+         internalProgram.removeAll()
+       
+    }
     func clear(){
         accumulator = 0
         pending = nil
         internalProgram.removeAll()
+        variableValues.removeAll()
+        orderOfOperations = []
+        
+
+        
+    }
+    func undo(){
+        if !internalProgram.isEmpty{
+            internalProgram.removeLast()
+            orderOfOperations.removeLast()
+            program = internalProgram
+        }else{
+            clear();
+        }
     }
     var result: Double {
         get {
