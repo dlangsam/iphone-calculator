@@ -221,7 +221,9 @@ class CalculatorBrain {
             createOrderOfOperationString()
             //print("pre undo: " + description)
             internalProgram.removeLast()
-            internalProgram.removeLast()
+            if !internalProgram.isEmpty{
+                internalProgram.removeLast()
+            }
             orderOfOperations.removeLast()
             createOrderOfOperationString()
             //print("post undo: " + description)
