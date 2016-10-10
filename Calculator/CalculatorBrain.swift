@@ -54,7 +54,7 @@ class CalculatorBrain {
         "1/x": Operation.UnaryOperation({1/$0}),
         "±": Operation.UnaryOperation({-1*$0}),
         "ln": Operation.UnaryOperation(log),
-        //"x!": Operation.UnaryOperation(factorial),
+        "x!": Operation.UnaryOperation(factorial),
         "x^2": Operation.UnaryOperation({$0 * $0}),
         "e^x": Operation.UnaryOperation({pow(M_E, $0)}),
         "x^y": Operation.BinaryOperation({pow($0, $1)}),
