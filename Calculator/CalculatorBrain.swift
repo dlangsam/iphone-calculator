@@ -51,7 +51,7 @@ class CalculatorBrain {
         "cos": Operation.UnaryOperation(cos),
         "sin": Operation.UnaryOperation(sin),
         "tan": Operation.UnaryOperation(tan),
-        "1/x": Operation.UnaryOperation({1/$0}),
+        "x⁻¹": Operation.UnaryOperation({1/$0}),
         "±": Operation.UnaryOperation({-1*$0}),
         "ln": Operation.UnaryOperation(log),
         "x!": Operation.UnaryOperation(factorial),
@@ -106,12 +106,17 @@ class CalculatorBrain {
                         orderOfOperations.append(")²")
 
                 
+                    }else if(symbol == "x⁻¹"){
+                        orderOfOperations.insert("(", atIndex: insertIndex)
+                        orderOfOperations.append(")⁻¹")
+                        
+                        
                     }else{
                       orderOfOperations.insert(symbol + "(", atIndex: insertIndex)
                       orderOfOperations.append(")")
                     }
                    
-                    afterEqual = false
+                    afterEqual = true
                     accumulator = function(accumulator)
                 case .BinaryOperation(let function):
                     orderOfOperations.append(symbol)
