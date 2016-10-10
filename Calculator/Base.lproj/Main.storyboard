@@ -169,7 +169,6 @@
                                                                 </variation>
                                                                 <connections>
                                                                     <action selector="backspace:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mBY-q4-Ibe"/>
-                                                                    <action selector="performOperation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="BfY-Yo-8Ny"/>
                                                                 </connections>
                                                             </button>
                                                         </subviews>

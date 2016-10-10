@@ -149,7 +149,7 @@ class CalculatorBrain {
         get{
             
  
-            
+            print("get description: " + description)
             if orderOfOperations.isEmpty {return " "}
             else if isPartialResult { return description + "..."}
             else{ return description + "="}
@@ -162,6 +162,7 @@ class CalculatorBrain {
             return internalProgram
         }
         set {
+            print("Set program")
             eraseCalculation()
             if let arrayOfOps = newValue as? [AnyObject]
             {
@@ -180,6 +181,7 @@ class CalculatorBrain {
         }
     }
     private func eraseCalculation(){
+        print("Erase Calculation")
         accumulator = 0.0
         
         orderOfOperations = []
@@ -189,6 +191,7 @@ class CalculatorBrain {
        
     }
     func clear(){
+        print("Clear")
         accumulator = 0
         pending = nil
         internalProgram.removeAll()
@@ -199,18 +202,28 @@ class CalculatorBrain {
         
     }
     func undo(){
+        print("Undo")
         if !internalProgram.isEmpty{
+            createOrderOfOperationString()
+            print("pre undo: " + description)
+            internalProgram.removeLast()
             internalProgram.removeLast()
             orderOfOperations.removeLast()
+            createOrderOfOperationString()
+            print("post undo: " + description)
             program = internalProgram
+             accumulator = 0
+            
         }else{
             clear();
         }
+        afterEqual = false
     }
     var result: Double {
         get {
             createOrderOfOperationString()
-            print(description)
+            print("get result: " + description)
+            print("accumulaltor: " + String(accumulator))
             return accumulator
         }
     }
