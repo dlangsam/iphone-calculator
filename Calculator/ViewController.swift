@@ -39,7 +39,7 @@ class ViewController: UIViewController {
                 display.text = digit
             }
         }
-        print("Change typing to true")
+        //print("Change typing to true")
         userInMiddleOfTyping = true
        
         
@@ -49,7 +49,7 @@ class ViewController: UIViewController {
             return Double(display.text!)!
         }
         set{
-            print("setting display: " + String(newValue!))
+            //print("setting display: " + String(newValue!))
             display.text = newValue != nil ? String(newValue!) : " "
         }
     }
@@ -70,7 +70,7 @@ class ViewController: UIViewController {
         if userInMiddleOfTyping{
             brain.setOperand(displayValue!)
         }
-         print("Change typing to false")
+         //print("Change typing to false")
         userInMiddleOfTyping = false
         if let mathSymbol = sender.currentTitle{
             brain.performOperations(mathSymbol)
@@ -108,12 +108,12 @@ class ViewController: UIViewController {
         guard var number = display.text else {
             return
         }
-        print("number: " + number)
+        //print("number: " + number)
         number.removeAtIndex(number.endIndex.predecessor())
-             print("new number: " + number)
+             //print("new number: " + number)
         if number.isEmpty {
             number = "0"
-             print("Change typing to false2")
+            // print("Change typing to false2")
             userInMiddleOfTyping = false
         }
         display.text = number
