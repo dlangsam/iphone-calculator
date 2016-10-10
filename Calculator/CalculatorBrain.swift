@@ -55,9 +55,9 @@ class CalculatorBrain {
         "±": Operation.UnaryOperation({-1*$0}),
         "ln": Operation.UnaryOperation(log),
         "x!": Operation.UnaryOperation(factorial),
-        "x^2": Operation.UnaryOperation({$0 * $0}),
+        "x²": Operation.UnaryOperation({$0 * $0}),
         "e^x": Operation.UnaryOperation({pow(M_E, $0)}),
-        "x^y": Operation.BinaryOperation({pow($0, $1)}),
+        "xⁿ": Operation.BinaryOperation({pow($0, $1)}),
         "×": Operation.BinaryOperation({$0 * $1}),
         "÷": Operation.BinaryOperation({$0 / $1}),
         "+": Operation.BinaryOperation({$0 + $1}),
@@ -92,16 +92,25 @@ class CalculatorBrain {
                     else {orderOfOperations = [symbol]}
                     afterEqual = false;
                 case .UnaryOperation(let function):
-                
-                    if(!isPartialResult){
-                        orderOfOperations.insert(symbol + "(", atIndex: 0)
-                        orderOfOperations.append(")")
-                    }else{
-                        let length = orderOfOperations.count
-                        orderOfOperations.insert(symbol + "(", atIndex: length-1)
-                        orderOfOperations.append(")")
-
+                    var insertIndex:Int = 0;
+                    
+                    if(isPartialResult){
+                         let length = orderOfOperations.count
+                         insertIndex = length-1
                     }
+                    if(symbol == "x!"){
+                      orderOfOperations.insert("(", atIndex: insertIndex)
+                      orderOfOperations.append(")!")
+                    }else if(symbol == "x²"){
+                        orderOfOperations.insert("(", atIndex: insertIndex)
+                        orderOfOperations.append(")²")
+
+                
+                    }else{
+                      orderOfOperations.insert(symbol + "(", atIndex: insertIndex)
+                      orderOfOperations.append(")")
+                    }
+                   
                     afterEqual = false
                     accumulator = function(accumulator)
                 case .BinaryOperation(let function):

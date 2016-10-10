@@ -333,7 +333,7 @@
                                                                 <rect key="frame" x="82" y="0.0" width="72" height="90"/>
                                                                 <color key="backgroundColor" red="0.85043993250000005" green="0.84744796550000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                                <state key="normal" title="x^2">
+                                                                <state key="normal" title="x²">
                                                                     <color key="titleColor" red="0.95128435860000005" green="0.51955030540000002" blue="0.91140657550000004" alpha="1" colorSpace="calibratedRGB"/>
                                                                 </state>
                                                                 <variation key="widthClass=regular" misplaced="YES">
@@ -350,7 +350,7 @@
                                                                 <rect key="frame" x="163" y="0.0" width="72" height="90"/>
                                                                 <color key="backgroundColor" red="0.85043993250000005" green="0.84744796550000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                                <state key="normal" title="x^y">
+                                                                <state key="normal" title="xⁿ">
                                                                     <color key="titleColor" red="0.95128435860000005" green="0.51955030540000002" blue="0.91140657550000004" alpha="1" colorSpace="calibratedRGB"/>
                                                                 </state>
                                                                 <variation key="widthClass=regular" misplaced="YES">
