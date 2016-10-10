@@ -83,7 +83,7 @@ class ViewController: UIViewController {
         if userInMiddleOfTyping {
             userInMiddleOfTyping = false
         }else{
-            //brain.undo()
+            brain.undo()
         }
         brain.program = brain.program
 
