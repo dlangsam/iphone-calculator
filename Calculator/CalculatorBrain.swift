@@ -17,29 +17,33 @@ func factorial(operand: Double) -> Double {
 class CalculatorBrain {
     private var accumulator = 0.0
     private var internalProgram = [AnyObject]()
+    private var tempProgram = [AnyObject]()
     private var isPartialResult: Bool {
         get{
             return pending != nil
         }
     }
     private var afterEqual = false
-    private var orderOfOperations = [String]()
     
     func setOperand(operand: Double){
-        orderOfOperations.append(String(operand))
+        if(afterEqual){
+            tempProgram = internalProgram
+            internalProgram.removeAll()
+        }
         internalProgram.append(operand)
         accumulator = operand
+        afterEqual = false
     }
     
     func setOperand(symbol: String){
-        if(afterEqual){
-            eraseCalculation()
-        }
         variableValues[symbol] = variableValues[symbol] ?? 0.0
         accumulator = variableValues[symbol]!
-        orderOfOperations.append(symbol)
+        if(afterEqual){
+            tempProgram = internalProgram
+            internalProgram.removeAll()
+        }
         internalProgram.append(symbol)
-     
+        afterEqual = false
     }
     
     var variableValues: Dictionary<String, Double> = [:]
@@ -72,59 +76,29 @@ class CalculatorBrain {
         case Equals
         case Clears
     }
-    func checkIfAfterEqual(){
-        if(afterEqual){
-            eraseCalculation()
-            afterEqual = false;
-        }
-        
-    }
     func performOperations(symbol: String){
+    
         internalProgram.append(symbol)
+
         if let operation  = operations[symbol]{
             switch operation{
                 case .Constant(let value):
                     if(afterEqual){
-                        eraseCalculation()
+                        tempProgram = internalProgram
+                        internalProgram.removeAll()
+                        internalProgram.append(symbol)
                     }
                     accumulator = value
-                    if isPartialResult {orderOfOperations.append(symbol)}
-                    else {orderOfOperations = [symbol]}
-                    afterEqual = false;
+                    afterEqual = true;
                 case .UnaryOperation(let function):
-                    var insertIndex:Int = 0;
-                    
-                    if(isPartialResult){
-                         let length = orderOfOperations.count
-                         insertIndex = length-1
-                    }
-                    if(symbol == "x!"){
-                      orderOfOperations.insert("(", atIndex: insertIndex)
-                      orderOfOperations.append(")!")
-                    }else if(symbol == "x²"){
-                        orderOfOperations.insert("(", atIndex: insertIndex)
-                        orderOfOperations.append(")²")
-
-                
-                    }else if(symbol == "x⁻¹"){
-                        orderOfOperations.insert("(", atIndex: insertIndex)
-                        orderOfOperations.append(")⁻¹")
-                        
-                        
-                    }else{
-                      orderOfOperations.insert(symbol + "(", atIndex: insertIndex)
-                      orderOfOperations.append(")")
-                    }
-                   
                     afterEqual = true
                     accumulator = function(accumulator)
                 case .BinaryOperation(let function):
-                    orderOfOperations.append(symbol)
                     executePendingBinaryOperation()
                     pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand:accumulator)
-                    
                     afterEqual = false
                 case .Equals:
+                    tempProgram = internalProgram
                     executePendingBinaryOperation()
                     afterEqual = true
                 case .Clears:
@@ -151,32 +125,88 @@ class CalculatorBrain {
     }
     private var description = ""
     private func createOrderOfOperationString() -> String{
-        description = ""
-        if orderOfOperations.isEmpty{ return description}
+        description = " "
+        if internalProgram.isEmpty{ return description}
+        var orderOfOperations = [String]()
+        var recentEqual = false;
+        var numDigits = 0;
+
+        for op in internalProgram{
+            if (op as? Double) != nil{
+                orderOfOperations.append(String(op))
+                numDigits += 1
+            }else if let variableName = op as? String{
+                if variableValues[variableName] != nil{
+                    orderOfOperations.append(variableName)
+                    recentEqual = false;
+                    numDigits = 1
+                }else if var operation = op as? String{
+                    if(operation == "="){
+                        orderOfOperations.insert("(", atIndex: 0)
+                        orderOfOperations.append(")")
+                        recentEqual = true;
+                    }else if(operation == "tan" || operation == "sin" || operation == "cos"
+                        || operation == "ln" || operation == "√" ||
+                        operation ==  "±" || operation ==  "eⁿ"){
+                        if(operation ==  "eⁿ"){
+                            operation = "e^"
+                        }
+                        if(recentEqual){
+                            orderOfOperations.insert(operation, atIndex: 0)
+                             orderOfOperations.append(")")
+                        }else{
+                            let length = orderOfOperations.count
+                            orderOfOperations.insert(operation + "(", atIndex: length - numDigits)
+                             orderOfOperations.append(")")
+                        }
+                        recentEqual = true;
+                    }else{
+                        if(operation == "x!"){
+                            operation = "!"
+                        }else if(operation == "x²"){
+                            operation = "²"
+                        }
+                        else if(operation == "x⁻¹"){
+                            operation = "⁻¹"
+                        }
+                        else if(operation == "xⁿ"){
+                            operation = "^"
+                        }
+                        orderOfOperations.append(operation)
+                        recentEqual = false;
+                    }
+                    numDigits = 0
+                }
+            }
+        }
+        
         for x in orderOfOperations{
             description += x
         }
+//        var temp = ""
+//        for y in internalProgram{
+//            temp += String(y)
+//        }
+//        print("Current program")
+//        print(temp)
+
         return description
         
     }
     var getDescription: String {
         get{
-            
- 
-            //print("get description: " + description)
-            if orderOfOperations.isEmpty {return " "}
+            if internalProgram.isEmpty{return description}
             else if isPartialResult { return description + "..."}
             else{ return description + "="}
+            
         }
     }
     typealias PropertyList = AnyObject
     var program: PropertyList{
         get {
-            //returns a copy of the array
             return internalProgram
         }
         set {
-            //print("Set program")
             eraseCalculation()
             if let arrayOfOps = newValue as? [AnyObject]
             {
@@ -194,39 +224,25 @@ class CalculatorBrain {
             }
         }
     }
-    private func eraseCalculation(){
-       // print("Erase Calculation")
+    func eraseCalculation(){
         accumulator = 0.0
-        
-        orderOfOperations = []
-        pending = nil
-
-         internalProgram.removeAll()
-       
-    }
-    func clear(){
-       // print("Clear")
-        accumulator = 0
         pending = nil
         internalProgram.removeAll()
-        variableValues.removeAll()
-        orderOfOperations = []
-        
-
-        
+    }
+    func clear(){
+       eraseCalculation()
+       variableValues.removeAll()
+    }
+    func restore(){
+        internalProgram = tempProgram;
     }
     func undo(){
-        //print("Undo")
-        if !internalProgram.isEmpty{
-            createOrderOfOperationString()
-            //print("pre undo: " + description)
-            internalProgram.removeLast()
             if !internalProgram.isEmpty{
+            internalProgram.removeLast()
+            if(!internalProgram.isEmpty){
                 internalProgram.removeLast()
+
             }
-            orderOfOperations.removeLast()
-            createOrderOfOperationString()
-            //print("post undo: " + description)
             program = internalProgram
              accumulator = 0
             
@@ -238,8 +254,6 @@ class CalculatorBrain {
     var result: Double {
         get {
             createOrderOfOperationString()
-            print("get result: " + description)
-           // print("accumulaltor: " + String(accumulator))
             return accumulator
         }
     }

@@ -26,7 +26,7 @@ class ViewController: UIViewController {
      private var brain = CalculatorBrain()
     @IBAction private func touchDigit(sender: UIButton) {
   
-        brain.checkIfAfterEqual()
+       
         let digit = sender.currentTitle!
         if(userInMiddleOfTyping){
             let textCurrentlyInDisplay = display.text!
@@ -83,7 +83,7 @@ class ViewController: UIViewController {
         if userInMiddleOfTyping {
             userInMiddleOfTyping = false
         }else{
-            brain.undo()
+            brain.restore()
         }
         brain.program = brain.program
        
@@ -108,12 +108,9 @@ class ViewController: UIViewController {
         guard var number = display.text else {
             return
         }
-        //print("number: " + number)
         number.removeAtIndex(number.endIndex.predecessor())
-             //print("new number: " + number)
         if number.isEmpty {
             number = "0"
-            // print("Change typing to false2")
             userInMiddleOfTyping = false
         }
         display.text = number
